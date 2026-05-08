@@ -9,65 +9,63 @@
 
 ---
 
-## Descripción del proyecto
+## Contexto
 
-Durante las últimas semanas construyeron un pipeline ETL completo usando sus propias cuentas de Spotify como fuente de datos. El resultado es un mini Data Warehouse personal en PostgreSQL con un backend en FastAPI, un frontend en React o Next.js, y una capa de análisis exploratorio sobre los datos reales cargados.
+Chicos, llegamos al final. Durante estas semanas vimos que es un DataWareHouse y entendimos los pasos para construirlo. Ahora es momento de pasar de la teória a la práctica y que materialicen ese conocimiento con la construcción completa de un pipeline ETL real, con datos reales de Spotify, una base de datos en la nube y un frontend que lo muestra todo. Ahora lo que quiero es que me muestren que entienden lo que hicieron — no solo que funcione, sino que sepan explicar por qué cada pieza está donde está.
 
-Este examen evalúa la implementación completa del sistema, la capacidad de análisis sobre los propios datos y la comprensión de las decisiones técnicas tomadas durante el desarrollo.
-
----
-
-## Instrucciones generales
-
-1. El trabajo es en parejas. No se aceptan entregas individuales ni grupos de tres.
-2. Cada integrante de la pareja debe poder defender y explicar cualquier parte del proyecto en una sustentación oral si el profesor lo solicita.
-3. Ambos integrantes deben mostrar sus modelos de diseño generados con IA (mockups, diagramas de arquitectura o wireframes). No se acepta un solo modelo compartido.
-4. Toda la entrega se hace a través del repositorio de GitHub del proyecto. El link al repositorio se entrega por el medio indicado por el profesor.
-5. El repositorio debe tener commits que reflejen el avance real del proyecto. Un repositorio con un solo commit con todo el código no será aceptado.
-6. El archivo `docs/` debe estar completo con la documentación de cada fase, incluyendo screenshots, prompts utilizados y técnicas de IA aplicadas según la estructura definida en el README.
-7. Los datos del EDA deben ser datos reales cargados desde su propia cuenta de Spotify. No se acepta datos sintéticos ni copiados.
-8. La carpeta `.env` y cualquier archivo con credenciales no debe estar en el repositorio.
+Este parcial evalúa el sistema completo: el backend, el frontend, el análisis de datos y las decisiones técnicas que tomaron en el camino.
 
 ---
 
-## Distribución del trabajo
+## Instrucciones — léanlas completo
 
-La pareja divide la implementación técnica entre los dos integrantes:
+1. Es en parejas. Ni individual ni de tres. Solo parejas.
+2. Cualquiera de los dos debe poder explicarme cualquier parte del proyecto si se los pregunto. Los dos son responsables de todo.
+3. Cada uno debe mostrar su propio modelo de diseño generado con IA — mockups, diagramas, wireframes. No vale un solo modelo para los dos.
+4. Todo se entrega por GitHub. El link lo mandan por el medio que indique.
+5. El repo debe tener commits que muestren que trabajaron de verdad. Un repo con un solo commit gigante no se acepta.
+6. La carpeta `docs/` debe estar completa con screenshots, prompts que usaron y técnicas de IA. Todo según la estructura del README.
+7. Los datos del análisis deben ser de su cuenta real de Spotify. Nada sintético, nada inventado.
+8. El `.env` y cualquier archivo con contraseñas o tokens no va al repo. Jamás.
+
+---
+
+## ¿Quién hace qué?
 
 | Integrante A | Integrante B |
 |---|---|
 | Backend (FastAPI, ETL, base de datos) | Frontend (React o Next.js, diseño con IA) |
-| Secciones 1, 2 y 4 del examen | Secciones 3 y 4 del examen |
-| Ambos responden la Sección 5 (preguntas técnicas) de forma individual |
+| Secciones 1, 2 y 4 | Secciones 3 y 4 |
+| Los dos responden la Sección 5 por separado |
 
-> La Sección 4 (EDA) es responsabilidad compartida pero cada integrante debe haber ejecutado el notebook y poder explicar los hallazgos.
+> El EDA (Sección 4) lo hacen juntos, pero los dos deben haber corrido el notebook y poder explicarme los hallazgos.
 
 ---
 
 ## Sección 1 — Backend (Integrante A)
 
-### 1.1 Implementación del pipeline ETL
+### 1.1 El pipeline ETL
 
-El backend debe tener implementadas las tres fases del ETL para los cuatro endpoints obligatorios de Spotify:
+Necesito las tres fases funcionando para los cuatro endpoints de Spotify:
 
 - `GET /v1/me` → `dim_users`
 - `GET /v1/me/top/artists` → `dim_artists`
 - `GET /v1/me/top/tracks` → `dim_tracks`
 - `GET /v1/me/player/recently-played` → `fact_listening_history`
 
-Cada fase (`extract_*`, `transform_*`, `load_*`) debe estar separada en funciones con docstrings completos según la Regla 3 del documento de definiciones.
+Cada fase — `extract_*`, `transform_*`, `load_*` — en funciones separadas con docstrings. Revisen la Regla 3 del documento de definiciones si tienen duda de cómo hacerlo.
 
 ### 1.2 Carga incremental
 
-El ETL debe usar el cursor `cursor_next_ms` de la tabla `etl_audit` para hacer cargas incrementales. No puede volver a cargar registros que ya existen en `fact_listening_history`.
+El ETL no puede volver a cargar lo que ya existe. Debe leer el cursor `cursor_next_ms` de `etl_audit` y traer solo lo nuevo desde esa fecha.
 
-### 1.3 Registro de auditoría
+### 1.3 Auditoría
 
-Cada ejecución del ETL debe quedar registrada en `etl_audit` con: tiempo de inicio, tiempo de fin, duración en ms, registros nuevos e insertados por tabla, y el cursor para la próxima ejecución.
+Cada vez que corra el ETL, queda registrado en `etl_audit`: cuándo empezó, cuándo terminó, cuánto tardó, cuántos registros nuevos hubo por tabla y el cursor para la próxima vez.
 
-### 1.4 Endpoints de la API
+### 1.4 Los endpoints
 
-Todos los endpoints listados en la Regla 7 deben estar implementados y protegidos con el JWT de la aplicación:
+Todos estos deben estar andando y protegidos con el JWT:
 
 ```
 GET  /v1/profile/me
@@ -80,7 +78,7 @@ GET  /v1/etl/status
 
 ### 1.5 Migraciones
 
-El schema completo del DWH debe estar versionado en Alembic. El comando `alembic upgrade head` ejecutado sobre una base de datos vacía debe crear todas las tablas correctamente.
+Todo el schema vive en Alembic. Correr `alembic upgrade head` en una base vacía tiene que crear todas las tablas. Sin eso no hay entrega válida.
 
 ---
 
@@ -88,158 +86,159 @@ El schema completo del DWH debe estar versionado en Alembic. El comando `alembic
 
 ### 2.1 DDL ejecutable
 
-El repositorio debe incluir el script DDL completo en `docs/01-ddl-migrations.md`. Ejecutarlo desde cero en una base de datos limpia debe producir exactamente el mismo schema que Alembic.
+En `docs/01-ddl-migrations.md` va el script DDL completo. Tiene que funcionar desde cero en una base limpia y producir el mismo resultado que Alembic.
 
-### 2.2 Datos cargados
+### 2.2 Datos reales cargados
 
-Evidencia de al menos tres ejecuciones exitosas del ETL en días distintos, visible en la tabla `etl_audit`. El `fact_listening_history` debe tener mínimo 100 registros para que el análisis del EDA sea significativo.
+Necesito ver mínimo tres ejecuciones del ETL en días distintos en la tabla `etl_audit`. Y `fact_listening_history` debe tener mínimo 100 registros — si tienen menos, el análisis no va a dar nada interesante.
 
-> Si la cuenta de Spotify tiene poca actividad reciente, la pareja debe ejecutar el ETL diariamente desde hoy y asegurarse de acumular suficientes datos antes de la entrega.
+> Si su cuenta de Spotify tiene poca actividad reciente, comiencen a correr el ETL desde hoy todos los días. No dejen eso para última hora.
 
 ---
 
 ## Sección 3 — Frontend (Integrante B)
 
-### 3.1 Páginas implementadas
+### 3.1 Las cinco páginas
 
-El frontend debe tener las cinco rutas funcionales:
-
-| Ruta | Requisito |
+| Ruta | Qué debe hacer |
 |---|---|
-| `/login` | Botón "Conectar con Spotify", flujo PKCE completo sin copiar tokens |
-| `/callback` | Recibe el JWT, lo guarda en `localStorage`, redirige al dashboard |
+| `/login` | Botón "Conectar con Spotify", flujo completo sin copiar tokens a mano |
+| `/callback` | Recibe el JWT, lo guarda, redirige al dashboard |
 | `/dashboard` | Mínimo 4 widgets con datos reales del backend |
-| `/profile` | Perfil completo del usuario con avatar y datos de Spotify |
-| `/etl` | Estado del DWH, historial de ejecuciones, botón "Sincronizar" con log |
+| `/profile` | Perfil completo con avatar y datos de Spotify |
+| `/etl` | Estado del DWH, historial de ejecuciones, botón "Sincronizar" con log paso a paso |
 
-### 3.2 Integración real con el backend
+### 3.2 Los datos vienen del backend
 
-Los datos del dashboard deben venir del backend, no directamente de la Spotify API. Todas las rutas protegidas deben enviar el `Bearer <token>` automáticamente.
+El dashboard no llama directamente a Spotify. Todo pasa por el backend. Y todas las rutas protegidas mandan el token automáticamente — no lo tienen que pegar a mano.
 
 ### 3.3 Estado vacío
 
-La aplicación debe manejar el caso en que las tablas del DWH están vacías (antes del primer ETL) con un mensaje claro que indique al usuario que debe sincronizar sus datos.
+Si las tablas están vacías antes del primer ETL, la app debe decirlo claro. Nada de pantallas en blanco sin explicación.
 
-### 3.4 Diseño generado con IA
+### 3.4 El diseño con IA
 
-Entregar el archivo de diseño (Figma, Stitch, Uizard u otra herramienta) con las vistas de las 5 páginas. Cada vista debe tener un párrafo escrito por el estudiante justificando las decisiones de UX tomadas.
+Entreguen el archivo de diseño (Figma, Stitch, Uizard, lo que usaron) con las 5 vistas. Cada vista necesita un párrafo explicando las decisiones de diseño que tomaron — por qué pusieron las cosas donde las pusieron.
 
-Incluir en `docs/03-frontend-implementation.md`:
-- Herramienta de IA utilizada para el diseño
-- Prompt exacto utilizado para generar los mockups
-- Capturas de pantalla del diseño y del resultado implementado
-
----
-
-## Sección 4 — Análisis Exploratorio de Datos (EDA)
-
-El EDA se implementa en un **Google Colab o Jupyter Notebook** conectado directamente a la base de datos Neon. Los análisis deben hacerse sobre los datos reales de la cuenta de Spotify del estudiante.
-
-El notebook debe entregarse en la carpeta `notebooks/` del repositorio con el nombre `eda_spotify_[nombre1]_[nombre2].ipynb`.
-
-### 4.1 Carga y exploración inicial
-
-- Conectar al DWH usando `psycopg2` o `SQLAlchemy` con las credenciales del `.env`.
-- Cargar las tablas relevantes en DataFrames de pandas.
-- Mostrar para cada tabla: número de filas, tipos de datos, porcentaje de valores nulos por columna.
-- Identificar y documentar cualquier anomalía encontrada en los datos.
-
-### 4.2 Análisis temporal
-
-- ¿A qué horas del día escuchan más música? Gráfico de barras con conteo por hora.
-- ¿Cuáles son sus días de semana con más reproducciones? Gráfico de barras ordenado.
-- Construir un **heatmap de actividad** (eje X: hora del día, eje Y: día de semana, color: número de reproducciones). Este gráfico revela el patrón de consumo musical completo de la persona.
-- Interpretación escrita: ¿qué dice este patrón sobre sus hábitos? ¿Hay momentos del día claramente asociados a ciertos contextos (trabajo, estudio, transporte)?
-
-### 4.3 Análisis de artistas y géneros
-
-- Top 10 artistas más escuchados en el historial reciente (con conteo de reproducciones).
-- Explotar el array `genres` de `dim_artists` con `UNNEST` en SQL o `.explode()` en pandas. Graficar los 15 géneros más frecuentes.
-- ¿Qué tan concentrada está su escucha? ¿El 80% de las reproducciones corresponde al 20% de los artistas? (principio de Pareto). Construir una curva de concentración o un gráfico de participación acumulada.
-- Interpretación escrita: ¿son oyentes variados o muy enfocados en ciertos artistas?
-
-### 4.4 Análisis de popularidad
-
-- Distribución de popularidad de sus top tracks (histograma).
-- Calcular: promedio, mediana, mínimo y máximo de popularidad.
-- Clasificar sus canciones en tiers: `underground` (<30), `emerging` (30–60), `mainstream` (60–80), `viral` (>80). Graficar la distribución de tiers con un pie chart o bar chart.
-- Interpretación escrita: ¿escuchan música popular o underground? ¿Qué dice eso de su perfil como oyente?
-
-### 4.5 Análisis de duración
-
-- ¿Cuánto duran en promedio las canciones que escuchan? Distribución de `duration_ms` convertida a minutos.
-- ¿Hay diferencia en la duración promedio según el género musical dominante del artista?
-- Construir un boxplot de duración agrupado por los 5 géneros más frecuentes.
-
-### 4.6 Pregunta propia
-
-Cada integrante de la pareja debe formular **una pregunta original** que no esté en las secciones anteriores y responderla con datos del DWH. La pregunta debe:
-
-- No poder responderse con un simple `SELECT *`.
-- Requerir al menos un `JOIN` o una agregación.
-- Tener al menos una visualización asociada.
-- Tener una interpretación escrita de mínimo 3 oraciones.
-
-Ejemplos de preguntas válidas (no usar estas, formular las propias):
-- ¿Existe correlación entre la popularidad de un artista y la frecuencia con la que aparece en el historial?
-- ¿Las canciones escuchadas en contexto `playlist` son más o menos populares que las escuchadas en contexto `album`?
-- ¿Cuál es el artista que más varía en términos de géneros dentro de su catálogo?
-
-### 4.7 Conclusiones generales
-
-Un párrafo de mínimo 150 palabras por integrante respondiendo: ¿qué aprendieron de sus propios datos que no sabían antes? ¿Qué limitación del modelo de datos les impidió responder alguna pregunta que querían hacer? ¿Qué tabla o columna adicional agregarían al DWH para enriquecer el análisis?
+En `docs/03-frontend-implementation.md` incluyan:
+- Qué herramienta de IA usaron
+- El prompt exacto que usaron para generar los mockups
+- Screenshots del diseño y del resultado final implementado
 
 ---
 
-## Sección 5 — Preguntas técnicas (individual)
+## Sección 4 — Análisis de datos (EDA)
 
-Cada integrante responde estas preguntas de forma individual en un archivo `docs/technical_answers_[nombre].md`. Las respuestas deben ser propias — respuestas idénticas entre integrantes de la misma pareja se calificarán con cero.
+Chicos, esta es la sección más importante del parcial. Acá es donde demuestran que no solo cargaron datos — sino que los entienden.
+
+El análisis va en un **Google Colab o Jupyter Notebook** conectado directo a Neon. Con datos reales. El notebook va en la carpeta `notebooks/` con el nombre `eda_spotify_[nombre1]_[nombre2].ipynb`.
+
+### 4.1 Primero lo primero — carguen y revisen los datos
+
+- Conecten al DWH con `psycopg2` o `SQLAlchemy`.
+- Carguen las tablas en DataFrames de pandas.
+- Para cada tabla muestren: cuántas filas tiene, qué tipos de datos hay, qué porcentaje de cada columna tiene valores nulos.
+- Si encuentran algo raro en los datos, documéntenlo. No lo escondan.
+
+### 4.2 ¿Cuándo escuchan música?
+
+- ¿A qué hora del día escuchan más? Gráfico de barras por hora.
+- ¿Qué días de la semana son los más activos? Gráfico de barras ordenado de mayor a menor.
+- Construyan un **heatmap** con hora del día en un eje y día de la semana en el otro. El color muestra cuántas reproducciones hay en cada combinación. Este gráfico cuenta toda su historia musical de un vistazo.
+- Escríbanme qué les dice ese patrón. ¿Escuchan más en las mañanas? ¿Los fines de semana? ¿Hay una hora que claramente asocian con algo — estudiar, transportarse, descansar?
+
+### 4.3 ¿Qué artistas y géneros dominan?
+
+- Top 10 artistas más escuchados en el historial, con conteo de reproducciones.
+- El campo `genres` de `dim_artists` es un array. Expló­tenlo con `UNNEST` en SQL o `.explode()` en pandas. Grafiquen los 15 géneros más frecuentes.
+- Pregunta interesante: ¿el 20% de sus artistas acapara el 80% de sus reproducciones? Esto se llama el principio de Pareto. Construyan una curva que muestre qué tan concentrada está su escucha.
+- ¿Son oyentes variados o siempre vuelven a los mismos? Escríbanlo.
+
+### 4.4 ¿Qué tan popular es su música?
+
+- Histograma de la popularidad de sus top tracks (va de 0 a 100).
+- Calculen: promedio, mediana, mínimo y máximo.
+- Clasifiquen las canciones en cuatro categorías: `underground` (menos de 30), `emerging` (30–60), `mainstream` (60–80), `viral` (más de 80). Grafiquen cuántas canciones caen en cada categoría.
+- ¿Son oyentes mainstream o underground? ¿Eso los sorprende o era lo que esperaban?
+
+### 4.5 ¿Cómo son las canciones que escuchan?
+
+- ¿Cuánto duran en promedio? Conviertan `duration_ms` a minutos y grafiquen la distribución.
+- ¿Las canciones de ciertos géneros tienden a ser más largas o más cortas? Construyan un boxplot de duración agrupado por los 5 géneros más frecuentes.
+
+### 4.6 La pregunta de cada uno
+
+Acá viene lo más importante de esta sección. Cada integrante formula **una pregunta propia** — algo que genuinamente les genera curiosidad sobre sus datos — y la responde con código y visualizaciones.
+
+La pregunta tiene que cumplir esto:
+- No se puede responder con un simple `SELECT *`.
+- Necesita al menos un `JOIN` o una agregación.
+- Tiene que tener una visualización.
+- Tiene que tener una interpretación escrita de mínimo 3 oraciones.
+
+Ejemplos de lo que podrían preguntarse (no usen estos, inventen los propios):
+- ¿Existe relación entre qué tan popular es un artista y cuántas veces aparece en mi historial?
+- ¿Las canciones que escucho en modo playlist son más o menos populares que las que escucho en modo album?
+- ¿Hay un artista en mi top que tenga géneros completamente distintos entre sus canciones?
+
+### 4.7 ¿Qué aprendieron?
+
+Un párrafo por integrante — mínimo 150 palabras — respondiendo esto:
+- ¿Qué aprendieron de sus propios datos que no sabían?
+- ¿Hubo alguna pregunta que quisieron hacer pero el modelo de datos no les permitió responder? ¿Cuál?
+- ¿Qué tabla o columna le agregarían al DWH para poder hacer un análisis más rico?
+
+---
+
+## Sección 5 — Preguntas técnicas (cada uno por su lado)
+
+Cada integrante responde estas preguntas solo, en un archivo `docs/technical_answers_[nombre].md`. Respuestas iguales entre los dos integrantes de una pareja = cero en esta sección para ambos. Háganlo con sus palabras.
 
 **Pregunta 1**
-¿Cuál es la granularidad de la tabla `fact_listening_history`? ¿Qué representa exactamente una fila? ¿Por qué `played_at` no puede ser clave primaria por sí sola y cómo se resolvió ese problema en el modelo?
+¿Cuál es la granularidad de `fact_listening_history`? ¿Qué representa exactamente una fila? ¿Por qué `played_at` no puede ser clave primaria por sí sola y cómo se resolvió eso en el modelo?
 
 **Pregunta 2**
-El ETL usa `ON CONFLICT (spotify_id) DO NOTHING` para las dimensiones y `ON CONFLICT (user_id, played_at) DO NOTHING` para la tabla de hechos. ¿Qué propiedad garantiza esto? ¿Qué pasaría si no existiera esa cláusula y el ETL se ejecutara dos veces el mismo día?
+El ETL usa `ON CONFLICT (spotify_id) DO NOTHING` en las dimensiones y `ON CONFLICT (user_id, played_at) DO NOTHING` en la tabla de hechos. ¿Qué propiedad garantiza eso? ¿Qué pasaría si no existiera esa cláusula y corrieran el ETL dos veces el mismo día?
 
 **Pregunta 3**
-`dim_tracks` tiene una FK hacia `dim_artists`. ¿Qué tipo de schema produce esa relación entre dimensiones? ¿Cuál sería la alternativa en un star schema puro? ¿Por qué se decidió mantener la FK en este modelo y cuál es el trade-off?
+`dim_tracks` tiene una FK hacia `dim_artists`. ¿Qué tipo de schema genera esa relación entre dimensiones? ¿Cuál sería la alternativa en un star schema puro? ¿Por qué se decidió mantener la FK y cuál es el trade-off?
 
 **Pregunta 4**
-Expliquen el flujo completo de autenticación desde que el usuario hace clic en "Conectar con Spotify" hasta que el frontend tiene el JWT guardado en `localStorage`. ¿Qué es PKCE y por qué se usa en lugar del flujo de autorización estándar?
+Expliquen el flujo completo desde que el usuario hace clic en "Conectar con Spotify" hasta que el frontend tiene el JWT en `localStorage`. ¿Qué es PKCE y por qué se usa?
 
 **Pregunta 5**
-¿Para qué sirve el campo `cursor_next_ms` en la tabla `etl_audit`? ¿Qué problema resuelve en el contexto de la carga incremental del historial de reproducciones? ¿Qué pasaría si un estudiante escucha 80 canciones en un día sin ejecutar el ETL?
+¿Para qué sirve `cursor_next_ms` en `etl_audit`? ¿Qué problema resuelve? ¿Qué pasaría si escuchan 80 canciones en un día sin correr el ETL?
 
 ---
 
-## Rúbrica de evaluación
+## ¿Cómo los voy a evaluar?
 
-| Sección | Criterio | Porcentaje |
+| Sección | Qué reviso | Porcentaje |
 |---|---|---|
-| **Backend** | ETL funcional con las 3 fases, endpoints implementados, migraciones Alembic | 25% |
-| **Frontend** | 5 páginas funcionales, integración real con backend, diseño con IA documentado | 20% |
-| **EDA** | Análisis completo, visualizaciones con interpretación escrita, pregunta propia, conclusiones | 30% |
-| **Preguntas técnicas** | Respuestas individuales, correctas y con argumentación propia | 15% |
-| **Documentación** | `docs/` completo con screenshots, prompts y técnicas de IA por fase | 10% |
+| **Backend** | ETL con las 3 fases, endpoints andando, migraciones en Alembic | 25% |
+| **Frontend** | 5 páginas funcionales, datos reales del backend, diseño con IA documentado | 20% |
+| **EDA** | Análisis completo, gráficas con interpretación, pregunta propia, conclusiones | 30% |
+| **Preguntas técnicas** | Respuestas individuales, correctas, con sus propias palabras | 15% |
+| **Documentación** | `docs/` con screenshots, prompts y técnicas de IA por fase | 10% |
 
-### Criterios de penalización
+### Ojo con esto — penalizaciones
 
-- Repositorio sin historial de commits que refleje avance real: **−20 puntos sobre 100**
-- Datos del EDA no corresponden a una cuenta real de Spotify: **nota de cero en Sección 4**
-- Respuestas idénticas en Sección 5 entre integrantes de la misma pareja: **nota de cero en Sección 5 para ambos**
-- Credenciales (`.env`, tokens, client secret) expuestos en el repositorio: **nota de cero en la entrega completa**
+- Repo sin historial de commits real: **−20 puntos**
+- Datos del EDA que no son de Spotify real: **cero en Sección 4**
+- Respuestas iguales en Sección 5: **cero en Sección 5 para los dos**
+- Credenciales expuestas en el repo: **cero en todo el parcial**
 
 ---
 
 ## Entrega
 
-| Ítem | Ubicación en el repositorio |
+| Qué | Dónde va en el repo |
 |---|---|
 | Código backend | `backend/` |
 | Código frontend | `frontend/` |
 | Notebook EDA | `notebooks/eda_spotify_[nombre1]_[nombre2].ipynb` |
 | Documentación por fase | `docs/00-initial-config.md` … `docs/05-analytical-queries.md` |
-| Respuestas técnicas | `docs/technical_answers_[nombre].md` (uno por integrante) |
-| Diseño con IA | `docs/03-frontend-implementation.md` + archivo Figma o capturas |
+| Respuestas técnicas | `docs/technical_answers_[nombre].md` (uno por cada uno) |
+| Diseño con IA | `docs/03-frontend-implementation.md` + capturas o archivo Figma |
 
-El link al repositorio se entrega por el medio indicado antes del **viernes 22 de mayo de 2026 a las 11:59 p.m.** No se aceptan entregas tardías.
+Mándenme el link del repo antes del **viernes 22 de mayo de 2026 a las 11:59 p.m.** No hay prórroga. Cualquier duda me escriben. Hagale.
